@@ -1,6 +1,19 @@
-title: ABC Lab ELN
-author: ABC Lab
-logo: _static/logo.png
+# _config.yml
+title: "ABC Lab ELN"
+author: "ABC Lab @ UMD"
+logo: "_static/logo.png"
 html:
-  favicon: _static/favicon.ico
-  extra_footer: Copyright © ABC Lab
+  favicon: "_static/favicon.ico"
+  use_edit_page_button: false
+  extra_footer: |
+    <p>© ABC Lab – University of Maryland</p>
+parse:
+  myst_enable_extensions:
+    - colon_fence
+    - deflist
+    - html_admonition
+    - html_image
+    - linkify
+    - substitution
+    - tasklist
+launch_buttons: {}
