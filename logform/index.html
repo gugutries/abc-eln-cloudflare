@@ -58,7 +58,7 @@
     document.getElementById("logForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target));
-      const res = await fetch("/.netlify/functions/submit-log", {
+      const res = await fetch("/functions/submit-log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
