@@ -1,0 +1,24 @@
+name: 🚀 Deploy Log Form (Secure)
+
+on:
+  push:
+    paths:
+      - 'logform/**'
+      - '.github/workflows/deploy-logform.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repo
+        uses: actions/checkout@v3
+
+      - name: 🔐 Inject GitHub PAT into logform
+        run: |
+          sed -i "s|%%LOGFORM_PAT%%|${{ secrets.LOGFORM_PAT }}|g" logform/index.html
+
+      - name: 🚀 Deploy to GitHub Pages via gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./logform
