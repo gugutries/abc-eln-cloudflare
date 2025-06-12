@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -17,7 +16,7 @@ jobs:
         with:
           python-version: 3.11
 
-      - name: Install Python dependencies
+      - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Convert logs to ipynb
@@ -26,7 +25,9 @@ jobs:
           for f in notebooks/*.md; do
             jupytext --to ipynb "$f" -o "converted/$(basename "$f" .md).ipynb"
           done
-
+      - name: Generate auth.js with credentials
+        run: |
+          sed "s/%%USERNAME%%/${{ secrets.ELN_USER }}/g; s/%%PASSWORD%%/${{ secrets.ELN_PASS }}/g" _static/auth.js
       - name: Build Jupyter Book
         run: jupyter-book build .
 
@@ -34,18 +35,16 @@ jobs:
         run: |
           sed -i 's/%%USERNAME%%/${{ secrets.ELN_USER }}/g' _build/html/_static/auth.js
           sed -i 's/%%PASSWORD%%/${{ secrets.ELN_PASS }}/g' _build/html/_static/auth.js
+      - name: Copy logform to final build directory
+        run: cp -r logform _build/html/
 
-      - name: Copy logform and auth.js
-        run: |
-          cp -r logform _build/html/
-          cp _build/html/_static/auth.js _build/html/logform/
+      - name: Copy injected auth.js to built site
+        run: cp _static/auth.js _build/html/_static/auth.js
 
-      - name: Install Wrangler v4
-        run: npm install -g wrangler@latest
-
-      - name: Deploy to Cloudflare Pages
-        run: |
-          wrangler pages deploy _build/html \
-            --project-name abc-eln-cloudflare \
-            --branch main \
-            --api-token ${{ secrets.CF_API_TOKEN }}
+      - name: Upload to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: abc-eln-cloudflare
+          directory: _build/html
