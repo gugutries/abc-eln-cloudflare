@@ -2,7 +2,7 @@ title: ABC Lab ELN
 author: ABC Lab
 logo: _static/logo.png
 html:
-  extra_files:
+  extra_js:
     - _static/auth.js
   favicon: _static/favicon.ico
   use_repository_button: false
