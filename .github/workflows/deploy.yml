@@ -1,32 +1,47 @@
-name: 📘 Build & Deploy ELN
+name: 📘 Build and Deploy to Cloudflare Pages
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - README.md
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-      - run: |
-          mkdir -p converted
-          for f in notebooks/*.md; do
-            jupytext --to ipynb "$f" -o "converted/$(basename "$f" .md).ipynb"
-          done
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
 
-      - run: jupyter-book build .
+    - name: Install Python Dependencies
+      run: pip install -r requirements.txt
 
-      - name: Upload to GitHub Pages (Cloudflare Pages pulls from this branch)
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: _build/html
+    - name: Convert Markdown to Notebooks
+      run: |
+        mkdir -p converted
+        for f in notebooks/*.md; do
+          jupytext --to ipynb "$f" -o "converted/$(basename "$f" .md).ipynb"
+        done
+
+    - name: Build Jupyter Book
+      run: jupyter-book build .
+
+    - name: Inject Password
+      run: |
+        mkdir -p _build/html/_static
+        cp _static/auth.js _build/html/_static/auth.js
+        find _build/html -name "*.html" -exec sed -i 's#</head>#<script src="_static/auth.js"></script></head>#' {} +
+
+    - name: Upload to Cloudflare Pages
+      uses: cloudflare/pages-action@1
+      with:
+        apiToken: ${{ secrets.CF_API_TOKEN }}
+        accountId: ${{ secrets.CF_ACCOUNT_ID }}
+        projectName: abc-eln-cloudflare
+        directory: _build/html
