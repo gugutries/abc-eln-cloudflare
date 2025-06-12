@@ -56,16 +56,23 @@
   <script src="auth.js"></script>
   <script>
     document.getElementById("logForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const data = Object.fromEntries(new FormData(e.target));
-      const res = await fetch("/functions/submit-log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const r = await res.json();
-      alert(res.ok ? "✅ Log saved!" : `❌ Error: ${r.message}`);
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+
+  try {
+    const res = await fetch("/functions/submit-log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
+
+    const r = await res.json();
+    alert(res.ok ? "✅ Log saved!" : `❌ Error: ${r.message}`);
+  } catch (err) {
+    alert("⚠️ Network error or invalid function route.");
+    console.error(err);
+  }
+});
   </script>
 </body>
 </html>
