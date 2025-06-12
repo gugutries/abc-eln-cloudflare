@@ -35,7 +35,7 @@
 - **Notes:** ${data.notes || "N/A"}
 `;
 
-      const res = await fetch("https://api.github.com/repos/YOUR_USERNAME/abc-eln-cloudflare/contents/" + fileName, {
+      const res = await fetch("https://api.github.com/repos/gugutries/abc-eln-cloudflare/contents/" + fileName, {
         method: "PUT",
         headers: {
           "Authorization": "Bearer %%LOGFORM_PAT%%",  // will be replaced in GitHub Actions
