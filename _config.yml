@@ -1,0 +1,6 @@
+title: ABC Lab ELN
+author: ABC Lab
+logo: _static/logo.png
+html:
+  favicon: _static/favicon.ico
+  extra_footer: Copyright © ABC Lab
