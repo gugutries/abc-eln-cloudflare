@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ABC Lab Log Form</title>
+  <script src="../_static/auth.js"></script>
+</head>
+<body>
+  <h1>📋 Submit New Lab Log</h1>
+  <form id="logForm">
+    <label>Date <input type="date" name="date" required></label><br>
+    <label>Time <input type="time" name="time" required></label><br>
+    <label>Participant ID <input type="text" name="pid" required></label><br>
+    <label>RA Name <input type="text" name="ra" required></label><br>
+    <label>Task Order <input type="text" name="tasks" required></label><br>
+    <label>Bonus <input type="text" name="bonus"></label><br>
+    <label>Notes <textarea name="notes"></textarea></label><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById("logForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const fileName = `notebooks/${data.date}_${data.pid}.md`;
+
+      const content = `# Scan Log
+
+- **Date:** ${data.date}
+- **Time:** ${data.time}
+- **Participant ID:** ${data.pid}
+- **RA:** ${data.ra}
+- **Task Order:** ${data.tasks}
+- **Bonus:** ${data.bonus || "N/A"}
+- **Notes:** ${data.notes || "N/A"}
+`;
+
+      const res = await fetch("https://api.github.com/repos/YOUR_USERNAME/abc-eln-cloudflare/contents/" + fileName, {
+        method: "PUT",
+        headers: {
+          "Authorization": "Bearer %%LOGFORM_PAT%%",  // will be replaced in GitHub Actions
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: `Add log for ${data.date} ${data.pid}`,
+          content: btoa(unescape(encodeURIComponent(content))),
+          branch: "main"
+        })
+      });
+
+      const result = await res.json();
+      if (res.ok) {
+        alert("✅ Log submitted!");
+        e.target.reset();
+      } else {
+        alert("❌ Error: " + (result.message || "Unknown error"));
+      }
+    });
+  </script>
+</body>
+</html>
