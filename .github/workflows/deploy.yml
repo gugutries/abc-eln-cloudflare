@@ -48,5 +48,4 @@ jobs:
           wrangler pages deploy _build/html \
             --project-name abc-eln-cloudflare \
             --branch main \
-            --account-id ${{ secrets.CF_ACCOUNT_ID }} \
             --api-token ${{ secrets.CF_API_TOKEN }}
