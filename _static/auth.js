@@ -8,6 +8,7 @@
 
   if (user !== correctUsername || pass !== correctPassword) {
     document.body.innerHTML = "<h1 style='text-align:center;'>🔒 Access Denied. Contact Lab Admin.</h1>";
-    throw new Error("Unauthorized");
+    window.stop();
+    return;
   }
 })();
