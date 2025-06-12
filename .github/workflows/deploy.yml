@@ -41,6 +41,10 @@ jobs:
       - name: Copy injected auth.js to built site
         run: cp _static/auth.js _build/html/_static/auth.js
 
+      - name: Copy auth.js to logform too
+        run: cp _build/html/_static/auth.js _build/html/logform/
+
+
       - name: Upload to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
