@@ -1,47 +1,44 @@
-name: 📘 Build and Deploy to Cloudflare Pages
+name: 🌐 Deploy ELN to Cloudflare Pages
 
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - README.md
 
 jobs:
-  build-deploy:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
 
-    - name: Install Python Dependencies
-      run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-    - name: Convert Markdown to Notebooks
-      run: |
-        mkdir -p converted
-        for f in notebooks/*.md; do
-          jupytext --to ipynb "$f" -o "converted/$(basename "$f" .md).ipynb"
-        done
+      - name: Convert logs to ipynb
+        run: |
+          mkdir -p converted
+          for f in notebooks/*.md; do
+            jupytext --to ipynb "$f" -o "converted/$(basename "$f" .md).ipynb"
+          done
 
-    - name: Build Jupyter Book
-      run: jupyter-book build .
+      - name: Build Jupyter Book
+        run: jupyter-book build .
 
-    - name: Inject Password
-      run: |
-        mkdir -p _build/html/_static
-        cp _static/auth.js _build/html/_static/auth.js
-        find _build/html -name "*.html" -exec sed -i 's#</head>#<script src="_static/auth.js"></script></head>#' {} +
+      - name: Inject login credentials securely
+        run: |
+          mkdir -p _build/html/_static
+          sed "s/%%USERNAME%%/${{ secrets.ELN_USERNAME }}/; s/%%PASSWORD%%/${{ secrets.ELN_PASSWORD }}/" _static/auth.template.js > _build/html/_static/auth.js
+          echo '<script src="_static/auth.js"></script>' >> _build/html/intro.html
 
-    - name: Upload to Cloudflare Pages
-      uses: cloudflare/pages-action@1
-      with:
-        apiToken: ${{ secrets.CF_API_TOKEN }}
-        accountId: ${{ secrets.CF_ACCOUNT_ID }}
-        projectName: abc-eln-cloudflare
-        directory: _build/html
+      - name: Upload to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: abc-eln-cloudflare
+          directory: _build/html
