@@ -33,12 +33,16 @@ jobs:
       - name: Build Jupyter Book
         run: jupyter-book build .
 
-      - name: Inject login credentials securely
-        run: |
       - name: Inject login credentials
         run: |
           sed -i 's/%%USERNAME%%/${{ secrets.ELN_USER }}/g' _build/html/_static/auth.js
           sed -i 's/%%PASSWORD%%/${{ secrets.ELN_PASS }}/g' _build/html/_static/auth.js
+
+      - name: Copy logform to final build directory
+        run: cp -r logform _build/html/
+
+      - name: Copy injected auth.js to built site
+        run: cp _static/auth.js _build/html/_static/auth.js
 
       - name: Upload to Cloudflare Pages
         uses: cloudflare/pages-action@v1
