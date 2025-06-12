@@ -35,9 +35,10 @@ jobs:
 
       - name: Inject login credentials securely
         run: |
-          mkdir -p _build/html/_static
-          sed "s/%%USERNAME%%/${{ secrets.ELN_USERNAME }}/; s/%%PASSWORD%%/${{ secrets.ELN_PASSWORD }}/" _static/auth.template.js > _build/html/_static/auth.js
-          echo '<script src="_static/auth.js"></script>' >> _build/html/intro.html
+      - name: Inject login credentials
+        run: |
+          sed -i 's/%%USERNAME%%/${{ secrets.ELN_USER }}/g' _build/html/_static/auth.js
+          sed -i 's/%%PASSWORD%%/${{ secrets.ELN_PASS }}/g' _build/html/_static/auth.js
 
       - name: Upload to Cloudflare Pages
         uses: cloudflare/pages-action@v1
