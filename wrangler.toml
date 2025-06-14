@@ -1,0 +1,6 @@
+name = "submit-log"
+main = "worker/submit-log.js"
+compatibility_date = "2024-05-01"
+
+[vars]
+GITHUB_REPO = "gugutries/abc-eln-cloudflare"
