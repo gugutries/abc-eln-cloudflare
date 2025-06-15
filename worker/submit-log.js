@@ -36,7 +36,8 @@ export default {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${env.GH_API_TOKEN}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "User-Agent": "abc-eln-cloudflare-worker",
         },
         body: JSON.stringify({
           message: `Add log for ${body.pid} on ${body.date}`,
